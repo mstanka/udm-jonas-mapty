@@ -83,7 +83,13 @@ class App {
   #workouts = [];
 
   constructor() {
+    // get user's position
     this._getPosition();
+
+    // get data from local storage
+    this._getLocalStorage();
+
+    // attach event handlers
     form.addEventListener('submit', this._newWorkout.bind(this));
     inputType.addEventListener('change', this._toggleElevationField);
     containerWorkouts.addEventListener('click', this._moveToPopup.bind(this));
@@ -118,6 +124,11 @@ class App {
     // handling clicks on map
     // this refers to map and not to our App, so we need to bind it
     this.#map.on('click', this._showForm.bind(this));
+
+    // show markers from localStorage after the map was loaded
+    this.#workouts.forEach(work => {
+      this._renderWorkoutMarker(work);
+    });
   }
 
   _showForm(mapE) {
@@ -299,6 +310,27 @@ class App {
   _setLocalStorage() {
     // use only to store small amount of data not to slow down your application
     localStorage.setItem('workouts', JSON.stringify(this.#workouts));
+  }
+
+  _getLocalStorage() {
+    // the object received from localStorage lost its prototype chain - not inherit all methods that have before
+    // we can restore the object using the class and data to get the methods back
+    const data = JSON.parse(localStorage.getItem('workouts'));
+
+    if (!data) return;
+
+    this.#workouts = data;
+
+    this.#workouts.forEach(work => {
+      this._renderWorkout(work);
+    });
+  }
+
+  reset() {
+    localStorage.removeItem('workouts');
+    location.reload();
+
+    // to reset localStorage - write on console - app.reset()
   }
 }
 
