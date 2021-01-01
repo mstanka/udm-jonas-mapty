@@ -3,7 +3,7 @@
 class Workout {
   date = new Date();
   // convert current date to string and use last 10 numbers -  to create an unique id
-  id = (Date.now() + ' ').slice(-10);
+  id = (Date.now() + '').slice(-10);
   //clicks = 0;
 
   constructor(coords, distance, duration) {
@@ -198,6 +198,9 @@ class App {
 
     // hide form + clear input fields
     this._hideForm();
+
+    // set local storage to all workouts
+    this._setLocalStorage();
   }
 
   _renderWorkoutMarker(workout) {
@@ -278,11 +281,11 @@ class App {
 
     if (!workoutEl) return;
 
-    const workout = this.#workouts.find(
+    const workoutToFind = this.#workouts.find(
       work => work.id === workoutEl.dataset.id
     );
 
-    this.#map.setView(workout.coords, this.#mapZoomLevel, {
+    this.#map.setView(workoutToFind.coords, this.#mapZoomLevel, {
       animate: true,
       pan: {
         duration: 1,
@@ -291,6 +294,11 @@ class App {
 
     // using the public interface
     // workout.click();
+  }
+
+  _setLocalStorage() {
+    // use only to store small amount of data not to slow down your application
+    localStorage.setItem('workouts', JSON.stringify(this.#workouts));
   }
 }
 
